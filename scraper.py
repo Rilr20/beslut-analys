@@ -2,6 +2,8 @@ import requests
 import re
 import json
 from bs4 import BeautifulSoup
+from datetime import date
+
 url = "https://www.riksdagen.se/sv/ledamoter-och-partier/ledamoterna/"
 response =requests.get(url)
 html_content = response.text
@@ -33,14 +35,25 @@ def scrape_representative_profile_links(url, comissioner):
     section = soup.find_all('dd', attrs={'class': "sc-8f482e4e-2 opzdv"})
 
     if commisioner["vilde"]:
+        print("Jag är vilde")
         comissioner["valkrets"] = section[0].text.strip().split(", ")[1].split(" ")[0]
         commisioner["plats"] = section[0].text.strip().split(", ")[1].split(" ")[1]
     else:
         comissioner["valkrets"] = section[1].text.strip().split(", ")[1].split(" ")[0]
         commisioner["plats"] = section[1].text.strip().split(", ")[1].split(" ")[1]
 
-
+i = 1
 for commisioner in commisioner_list:
-
+    print(i)
     scrape_representative_profile_links(commisioner["url"], commisioner)
+    i+=1
 
+# sort by plats
+commisioner_list.sort(key=lambda x: x["plats"])
+
+
+# save to file
+date = date.today()
+f = open(f'output/riksdagen_{date}.json', 'w')
+
+f.write(json.dumps(commisioner_list))
