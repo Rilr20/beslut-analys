@@ -33,13 +33,13 @@ def scrape_representative_profile_links(url, comissioner):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     section = soup.find_all('dd', attrs={'class': "sc-8f482e4e-2 opzdv"})
-
+    
     if commisioner["vilde"]:
         print("Jag är vilde")
-        comissioner["valkrets"] = section[0].text.strip().split(", ")[1].split(" ")[0]
+        comissioner["valkrets"] = section[0].text.strip().split(", ")[0]
         commisioner["plats"] = section[0].text.strip().split(", ")[1].split(" ")[1]
     else:
-        comissioner["valkrets"] = section[1].text.strip().split(", ")[1].split(" ")[0]
+        comissioner["valkrets"] = section[1].text.strip().split(", ")[0]
         commisioner["plats"] = section[1].text.strip().split(", ")[1].split(" ")[1]
 
 i = 1
@@ -54,6 +54,6 @@ commisioner_list.sort(key=lambda x: x["plats"])
 
 # save to file
 date = date.today()
-f = open(f'output/riksdagen_{date}.json', 'w')
+f = open(f'frontend/data/riksdagen_{date}.json', 'w')
 
-f.write(json.dumps(commisioner_list))
+f.write(json.dumps(commisioner_list,ensure_ascii=False))
