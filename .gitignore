@@ -1,2 +1,5 @@
 .venv/
 frontend/node_modules
+__pycache__
+db/db.db
+.vscode/
