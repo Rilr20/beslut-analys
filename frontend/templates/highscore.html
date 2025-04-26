@@ -1,0 +1,172 @@
+{% include 'header.html' %}
+
+<h1 style="text-align: center; width: 550px; margin: auto; margin-bottom: 1em;">Highscore of {{highscore[0]["highscoreType"]}}</h1>
+
+<p style="display: none;" id="covid">*helt/delvis frånvarande under Coronariksdagen &lpar;2020-03-16 &rarr; 2021-09-14&rpar;</p>
+
+<form onchange="updateHighscore()" style="width: 550px;margin: auto;margin-bottom: 1em;text-align: center;" >
+    <input type="radio" name="selection" value="Ja" id="ja">
+    <label for="ja">Ja</label>
+
+    <input type="radio" name="selection" value="Nej" id="nej">
+    <label for="nej">Nej</label>
+
+    <input type="radio" name="selection" value="Avstår" id="avstar">
+    <label for="avstar">Avstår</label>
+
+    <input type="radio" name="selection" value="Frånvarande" id="franvarande">
+    <label for="franvarande">Frånvarande</label>
+
+    <input type="radio" name="selection" value="missed" id="missed">
+    <label for="missed">Missed</label>
+
+    <input type="radio" name="selection" value="streak" id="streak">
+    <label for="streak">Streak</label>
+</form>
+<ol id="hslist" style="margin: auto; width: 550px;">
+    <div id="hsdiv" style="display: flex; width: 550px; flex-direction: row; justify-content: space-between; text-align: center;">
+        <p style="width: 50px;">Count</p>
+        <p style="width: 170px;">Name</p>
+        <p style="width: 35px;">Party</p>
+        <p style="width: 245px;">Active between</p>
+
+    </div>
+    {%for score in highscore %}
+    <li>
+        <div style="display: flex; width: 550px; flex-direction: row; justify-content: space-between;">
+            <p style="width: 50px;text-align: center;">{{score["highscoreValue"]}}</p>
+            <p style="text-align: left; width: 170px;">{{score["member"]["name"]}}</p>
+            <p style="width: 35px;"> {{score["member"]["party"]}}</p>
+            <p style="width: 245px; text-align: center;">{{score["member"]["firstSeen"].split(" ")[0]}} &rarr; {{score["member"]["lastSeen"].split(" ")[0]}}</p>
+        </div>
+    </li>
+    {%endfor%}
+</ol>
+
+<script>
+    async function updateHighscore() {
+        // console.log("hej hej");
+        const selectedValue = document.querySelector('input[name="selection"]:checked')?.value;
+        console.log(selectedValue);
+        const response = await fetch("/highscore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: selectedValue })
+        })
+        console.log(response);
+        
+        const highscoreData = await response.json()
+        console.log(highscoreData);
+        // console.log(data[1]);
+
+        // const highscoreData = data;
+        // const membersData = data[1];
+
+        // Update the header
+        document.querySelector('h1').textContent = `Highscore of ${highscoreData[0]["highscoreType"]}`;
+
+        // Clear existing list items
+        const orderList = document.querySelector('ol');
+        while (orderList.firstChild) {
+            orderList.removeChild(orderList.firstChild);
+        }
+
+        // Create header row
+        const headerRow = document.createElement('div');
+        if (selectedValue === "streak") { 
+                headerRow.style.cssText = 'display: flex; width: 795px; flex-direction: row; justify-content: space-between; text-align: center;';
+            headerRow.innerHTML = `
+                <p style="width: 50px;">Count</p>
+                <p style="width: 170px;">Name</p>
+                <p style="width: 35px;">Party</p>
+                <p style="width: 245px;">Absent Streak</p>
+                <p style="width: 245px;">Active between</p>
+            `;
+        }
+        else {
+
+
+            headerRow.style.cssText = 'display: flex; width: 550px; flex-direction: row; justify-content: space-between; text-align: center;';
+            headerRow.innerHTML = `
+                <p style="width: 50px;">Count</p>
+                <p style="width: 170px;">Name</p>
+                <p style="width: 35px;">Party</p>
+                <p style="width: 245px;">Active between</p>
+            `;
+        }
+
+        orderList.appendChild(headerRow);
+        // console.log(highscoreData[0].highscoreType);
+        // console.log(highscoreData[0].highscoreType === "Frånvarande");
+        const covidParagrah = document.getElementById("covid");
+        const isAbsent = highscoreData[0].highscoreType === "Frånvarande"
+        if (isAbsent) {
+            covidParagrah.style = "display:block; text-align: center;"
+        } else {
+            covidParagrah.style = "display:none; text-align: center;"
+        }
+        // Create list items for each score
+
+        highscoreData.forEach((score, index) => {
+            const listItem = document.createElement('li');
+            const member = score["member"];
+            // console.log(isAbsent + "is absent");
+            let isCovid = false
+            
+            
+            if (isAbsent && selectedValue !== "streak") {
+                isCovid = dateCheck("2020-03-16","2021-09-14", member["firstSeen"].split(" ")[0], member["lastSeen"].split(" ")[0]) == true ? true : false;
+            } else if (selectedValue === "streak") {
+                console.log("whathwhwhawthwathawthwath");
+                isCovid = dateCheck("2020-03-16", "2021-09-14", score["startDate"].split(" ")[0], score["endDate"].split(" ")[0]) == true ? true : false;
+            }
+            let number = 10
+
+            // console.log(isCovid);
+            const hsList = document.getElementById("hslist");
+            if (selectedValue === "streak") {
+                hsList.style ="margin: auto; width: 795px;"
+
+                listItem.innerHTML = `
+                <div style="display: flex; width: 795px; flex-direction: row; justify-content: space-between;">
+                    <p style="width: 50px; text-align:center;">${score["streakValue"]}</p>
+                    <p style="text-align: left; width: 170px;">${member["name"]}</p>
+                    <p style="width: 35px;"> ${member["party"]}</p>
+                    <p style="width: 245px; text-align: center;"> ${score["startDate"].split(" ")[0]} → ${score["endDate"].split(" ")[0]} ${isCovid == true ? "*" : ""}</p>
+                    <p style="width: 245px; text-align: center;">${member["firstSeen"].split(" ")[0]} → ${member["lastSeen"].split(" ")[0]} </p>
+                </div>
+            `;
+            } else {
+                hsList.style ="margin: auto; width: 550px;"
+
+                listItem.innerHTML = `
+                    <div style="display: flex; width: 550px; flex-direction: row; justify-content: space-between;">
+                        <p style="width: 50px; text-align:center;">${score["highscoreValue"]}</p>
+                        <p style="text-align: left; width: 170px;">${member["name"]}</p>
+                        <p style="width: 35px;"> ${member["party"]}</p>
+                        <p style="width: 245px; text-align: center;">${member["firstSeen"].split(" ")[0]} → ${member["lastSeen"].split(" ")[0]} ${isCovid==true ? "*" : ""} </p>
+                    </div>
+                `;
+            }
+            orderList.appendChild(listItem);
+        });
+
+        function dateCheck(start,end,firstSeen, lastSeen){
+            /**
+             * @start & @end - of coronariksdagen
+            */
+             let startDate = Date.parse(start)
+            let endDate = Date.parse(end)
+            let firstDate = Date.parse(firstSeen)
+            let lastDate = Date.parse(lastSeen)
+            
+            if (startDate >= firstDate && startDate <= lastDate || endDate >= firstDate && endDate <= lastDate ) {
+                
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+</script>
+{% include 'footer.html' %}

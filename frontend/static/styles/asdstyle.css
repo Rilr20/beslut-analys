@@ -1,29 +1,113 @@
-.party-color-C {
+@charset "UTF-8";
+.svg-SD {
+  width: 25px;
+  height: auto;
+  position: relative;
+  top: -7px;
+}
+.svg-C {
+  width: 25px;
+  height: auto;
+  position: relative;
+  top: -8px;
+}
+.svg-FP {
+  width: 30px;
+  height: auto;
+  position: relative;
+  top: -5px;
+}
+.svg-KD {
+  width: 25px;
+  height: auto;
+  position: relative;
+  top: -5px;
+}
+.svg-L {
+  width: 20px;
+  height: auto;
+  position: relative;
+  top: -6px;
+  left: 3px;
+}
+.svg-M {
+  width: 26px;
+  height: auto;
+  position: relative;
+  top: -4px;
+}
+.svg-MP {
+  width: 30px;
+  height: auto;
+  position: relative;
+  top: -6px;
+}
+.svg-S {
+  width: 35px;
+  height: auto;
+  position: relative;
+  top: -5px;
+  left: -3px;
+}
+.svg-V {
+  width: 28px;
+  height: auto;
+  position: relative;
+  top: -5px;
+}
+
+.vote-Ja {
+  background-color: rgb(111, 207, 151);
+  border-color: rgb(33, 150, 83);
+}
+.vote-Nej {
+  background-color: rgb(235, 87, 87);
+  border-color: rgb(121, 26, 26);
+}
+.vote-Frånvarande {
+  background-color: rgb(227, 228, 228);
+  border-color: rgb(140, 140, 140);
+}
+.vote-Avstår {
+  background-color: rgb(255, 223, 102);
+  border-color: rgb(204, 179, 51);
+}
+
+.party-color-C:hover {
   background-color: #009933;
+  z-index: 1;
 }
-.party-color-KD {
+.party-color-KD:hover {
   background-color: #000077;
+  z-index: 1;
 }
-.party-color-L {
+.party-color-FP:hover, .party-color-L:hover {
   background-color: #006AB3;
+  z-index: 1;
 }
-.party-color-MP {
+.party-color-MP:hover {
   background-color: #83CF39;
+  z-index: 1;
 }
-.party-color-M {
+.party-color-M:hover {
   background-color: #52BDEC;
+  z-index: 1;
 }
-.party-color-S {
-  background-color: #E8112d;
+.party-color-S:hover {
+  background-color: #e22740;
+  z-index: 1;
 }
-.party-color-SD {
+.party-color-SD:hover {
   background-color: #DDDD00;
+  z-index: 1;
 }
-.party-color-V {
+.party-color-V:hover {
   background-color: #DA291C;
+  z-index: 1;
 }
-.party-color-vilde {
+.party-color--:hover, .party-color---:hover, .party-color-vilde:hover {
   background-color: #555555;
+  z-index: 1;
 }
 
 .plenisalen {
@@ -37,16 +121,14 @@
 }
 
 .position {
-  height: 16px;
-  width: 16px;
+  height: 8px;
+  width: 8px;
   border-radius: 100%;
-  border: 5px solid white;
   position: absolute;
 }
 
 .position:hover {
   cursor: pointer;
-  border: 5px solid lightslategrey;
 }
 
 [id="1"] {
@@ -1793,3 +1875,5 @@
   top: 0.46%;
   left: 67.95%;
 }
+
+/*# sourceMappingURL=style.css.map */

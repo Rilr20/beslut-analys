@@ -1,40 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Plenisalen</title>
-</head>
+{% include 'header.html' %}
 <body>
+    <!--
+        Filter by political party / coalition 
+    -->
+    <select id="year" onchange="updateBillsByYear()">
+        <option value="" disabled selected>Select Year</option>
+        {%for year in years %}
+            <option value="{{ year }}">{{ year }}</option>
+        {%endfor%}
+    </select>
+    <select style="width: 50%;" name="" id="bill" onchange="updateSubBillsByBill()">
+        <option value="" disabled selected>Select Bill</option>
+
+    </select>
+    <select name="" id="sub-bill" onchange="updatePlenisalen()">
+        <option value="" disabled selected>Select Point</option>
+
+    </select>
+
+    <p class="bill-info"></p>
     <div id="plenisalen" class="plenisalen">
-        <div id="1" class="position party-color-C"></div>
-        <div id="2" class="position party-color-C"></div>
-        <div id="3" class="position party-color-L"></div>
-        <div id="4" class="position party-color-L"></div>
-        <div id="5" class="position party-color-L"></div>
-        <div id="6" class="position party-color-M"></div>
-        <div id="7" class="position party-color-M"></div>
-        <div id="8" class="position party-color-M"></div>
-        <div id="9" class="position party-color-M"></div>
-        <div id="10" class="position party-color-M"></div>
-        <div id="11" class="position party-color-M"></div>
-        <div id="12" class="position party-color-M"></div>
-        <div id="13" class="position party-color-M"></div>
-        <div id="14" class="position party-color-KD"></div>
-        <div id="15" class="position party-color-KD"></div>
-        <div id="16" class="position party-color-S"></div>
-        <div id="17" class="position party-color-S"></div>
-        <div id="18" class="position party-color-S"></div>
-        <div id="19" class="position party-color-S"></div>
-        <div id="20" class="position party-color-S"></div>
-        <div id="21" class="position party-color-S"></div>
-        <div id="22" class="position party-color-S"></div>
-        <div id="23" class="position party-color-S"></div>
-        <div id="24" class="position party-color-S"></div>
-        <div id="25" class="position party-color-S"></div>
-        <div id="26" class="position party-color-S"></div>
+        <!-- {{len}} -->
+        {%for item in data.votes %}
+             <div id="{{item.member.placement}}" class="position party-color-{{item.member.party}} vote-{{item.vote}}"></div> 
+        {%endfor%}
+    </div>
+        <!-- <div id="2" class="position party-color"></div>
+        <div id="3" class="position party-color"></div>
+        <div id="4" class="position party-color"></div>
+        <div id="5" class="position party-color"></div>
+        <div id="6" class="position party-color"></div>
+        <div id="7" class="position party-color"></div>
+        <div id="8" class="position party-color"></div>
+        <div id="9" class="position party-color"></div>
+        <div id="10" class="position party-color"></div>
+        <div id="11" class="position party-color"></div>
+        <div id="12" class="position party-color"></div>
+        <div id="13" class="position party-color"></div>
+        <div id="14" class="position party-color"></div>
+        <div id="15" class="position party-color"></div>
+        <div id="16" class="position party-color"></div>
+        <div id="17" class="position party-color"></div>
+        <div id="18" class="position party-color"></div>
+        <div id="19" class="position party-color"></div>
+        <div id="20" class="position party-color"></div>
+        <div id="21" class="position party-color"></div>
+        <div id="22" class="position party-color"></div>
+        <div id="23" class="position party-color"></div>
+        <div id="24" class="position party-color"></div>
+        <div id="25" class="position party-color"></div>
+        <div id="26" class="position party-color"></div>
         <div id="27" class="position party-color"></div>
         <div id="28" class="position party-color"></div>
         <div id="29" class="position party-color"></div>
@@ -357,35 +372,74 @@
         <div id="346" class="position party-color"></div>
         <div id="347" class="position party-color"></div>
         <div id="348" class="position party-color"></div>
-        <div id="349" class="position party-color"></div>
-    </div>
-    <script>
-        async function getFile() {
-                path = "./data/riksdagen_2024-09-12.json"
-                const response = await fetch(path)
-                
-                console.log(response);
-                const json = await response.json();
-
-                return json
-            }
-        async function main() {
-            const json = await getFile()
-            json.forEach(element => {
-                let div = document.getElementById(element.plats);
-                if (div !== null) {
-                    if (element.parti !== undefined) {
-                        div.classList = `position party-color-${element.parti}`
-                    } else {
-                        div.classList = `position party-color-vilde`
-                    }
-                    // console.log(element.parti);
-                }
-                
-            });
-        }
-        main();
-    </script>
+        <div id="349" class="position party-color"></div> -->
 </body>
+<script>
+    let year = ""
+    async function updateBillsByYear(){
+        year = document.getElementById('year').value;
+        if (!year) return;
 
-</html>
+        const response = await fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data_type: "bills", year: year })
+        })
+        const bills = await response.json();
+
+        const billSelected = document.getElementById('bill')
+        billSelected.innerHTML = '<option value="">Select Bill</option>';
+        
+        bills.forEach(bill => {
+            
+            billSelected.innerHTML += `<option value="${bill.report}">${bill.report} | ${bill.name}</option>`;
+        });
+    }
+
+    async function updateSubBillsByBill() {
+        const billReport = document.getElementById('bill').value
+        
+        if (!billReport) return;
+        
+        const response = await fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ "data_type": "bill_report", "bill_report": billReport, "year": year })
+        });
+
+        const subBills = await response.json()
+
+        console.log(subBills);
+        
+        const subBillSelect = document.getElementById('sub-bill')
+        subBillSelect.innerHTML = '<option value="">Select Sub-bill</option>';
+
+        subBills.forEach(subBill => {
+            subBillSelect.innerHTML += `<option value="${subBill.id}">${subBill.point}</option>`;
+        })
+    }
+    async function updatePlenisalen() {
+        const billId = document.getElementById('sub-bill').value
+        if (!billId) return;
+        const response = await fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data_type: "votes", bill_id: billId})
+        });
+        const data = await response.json()
+
+        const plenisalenDiv = document.getElementById('plenisalen')
+        const billInfo = document.getElementById('bill-info')
+        console.log(data);
+        
+        plenisalenDiv.innerHTML = ''
+        // billInfo.innerHTML = `${votes.date}`
+
+         data.votes.forEach(vote => {
+            plenisalenDiv.innerHTML += `
+            <div id="${vote.member.placement}" class="position party-color-${vote.member.party} vote-${vote.vote}"></div> 
+        `;
+        });
+    }
+</script>
+{% include 'footer.html' %}

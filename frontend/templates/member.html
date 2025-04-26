@@ -1,0 +1,17 @@
+{% include 'header.html' %}
+
+
+<h1>Representative</h1>
+
+<h2>{{member.name}} | {{member.party}} | <img class="svg-FP"
+        src="{{url_for('static', filename='svg/'+member.party+'.svg')}}" align="middle" />
+</h2>
+
+<h3>sittplats: {{member.placement}}</h3>
+<h3>first seen: {{member.firstSeen.split(' ')[0]}} | last seen: {{member.lastSeen.split(' ')[0]}}</h3>
+{%for vote in member.votes %}
+    <p>{{ vote.bill.report }} | Point {{vote.bill.point}} | {{ vote.bill.name }} </p>
+    <p>{{vote.bill.date.split(' ')[0]}} | {{vote.vote}}</p>
+{%endfor%}
+
+{% include 'footer.html' %}

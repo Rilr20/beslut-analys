@@ -3,45 +3,139 @@ $kristdemokraterna: #000077;
 $liberalerna: #006AB3;
 $miljopartiet: #83CF39;
 $moderaterna: #52BDEC;
-$socialdemokraterna: #E8112d;
+$socialdemokraterna: #e22740;
 $sverigedemokraterna: #DDDD00;
 $vansterpartiet: #DA291C;
 
-.party-color- {
-    &C {
-        background-color: $centerpartiet;
-    }
-
-    &KD {
-        background-color: $kristdemokraterna;
-    }
-
-    &L {
-        background-color: $liberalerna;
-    }
-
-    &MP {
-        background-color: $miljopartiet;
-    }
-
-    &M {
-        background-color: $moderaterna;
-    }
-
-    &S {
-        background-color: $socialdemokraterna;
-    }
-
+.svg-{
     &SD {
-        background-color: $sverigedemokraterna;
+        width: 25px;
+        height: auto;
+        position: relative;
+        top: -7px;
+    }
+    &C {
+        width: 25px;
+        height: auto;
+        position: relative;
+        top:-8px;
+    }
+    &FP {
+        width: 30px;
+        height: auto;
+        position: relative;
+        top: -5px;
+    }
+    &KD {
+        width: 25px;
+        height: auto;
+        position: relative;
+        top:-5px;
+    }
+    &L {
+        width: 20px;
+        height: auto;
+        position: relative;
+        top: -6px;
+        left: 3px;
+    }
+    &M {
+        width: 26px;
+        height: auto;
+        position: relative;
+        top: -4px;
+    }
+    &MP {
+        width: 30px;
+        height: auto;
+        position: relative;
+        top: -6px;
+    }
+    &S {
+        width: 35px;
+        height: auto;
+        position: relative;
+        top: -5px;
+        left: -3px;
+    }
+    &V {
+        width: 28px;
+        height: auto;
+        position: relative;
+        top: -5px;
+    }
+}
+
+.vote-{
+    &Ja {
+        background-color: rgb(111, 207, 151);
+        border-color:rgb(33, 150, 83);
+    }
+    &Nej  {
+    background-color: rgb(235, 87, 87);
+    border-color: rgb(121, 26, 26);
+
+    }
+    &Frånvarande {
+        background-color: rgb(227, 228, 228);
+        border-color:rgb(140, 140, 140);
+
+    }
+    &Avstår {
+        background-color: rgb(255, 223, 102);
+        border-color: rgb(204, 179, 51);
+
+    }
+}
+
+.party-color- {
+    &C:hover {
+        background-color: $centerpartiet;
+        z-index: 1;
     }
 
-    &V {
+    &KD:hover {
+        background-color: $kristdemokraterna;
+        z-index: 1;
+    }
+
+    &FP:hover,
+    &L:hover {
+        background-color: $liberalerna;
+        z-index: 1;
+    }
+
+    &MP:hover {
+        background-color: $miljopartiet;
+        z-index: 1;
+    }
+
+    &M:hover {
+        background-color: $moderaterna;
+        z-index: 1;
+    }
+
+    &S:hover {
+        background-color: $socialdemokraterna;
+        z-index: 1;
+    }
+
+    &SD:hover {
+        background-color: $sverigedemokraterna;
+        z-index: 1;
+    }
+
+    &V:hover {
         background-color: $vansterpartiet;
+        z-index: 1;
     }
-    &vilde {
+    &-:hover,
+    &--:hover,
+    &vilde:hover {
         background-color: #555555;
+        z-index: 1;
     }
+    
 }
 
 .plenisalen {
@@ -63,16 +157,15 @@ $vansterpartiet: #DA291C;
     // height: 8px;
     // width: 8px;
     // border: 3px solid white;
-
-    height: 16px;
-    width: 16px;
-    border-radius: 100%;
-    border: 5px solid white;
+    height: 8px;
+    width: 8px;
+    border-radius:100%;
+    // border: 2px solid black;
     position:absolute;
 }
 .position:hover {
     cursor: pointer;
-    border: 5px solid lightslategrey;
+    // border: 2px solid lightslategrey;
 }
 
 [id="1"] { left: 3.9%; top: 45.6%; }
