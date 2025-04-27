@@ -4,6 +4,7 @@ import re
 import json
 import time
 import sqlite3
+import dateparser
 
 def main():
     # https://data.riksdagen.se/voteringlista/?rm=2023%2F24&rm=2022%2F23&bet=&punkt=&valkrets=&rost=&iid=0327372175911&sz=10000&utformat=HTML&gruppering=
@@ -23,17 +24,8 @@ def main():
         sections = soup.find_all("li")
         idx = 1
         total = len(sections)
-        # if start == False and url_idx == 1:
-        #     # num = 4971+259-1+418-1+340-1+32-1+1248-1+1022-1
-        #     num = len(sections)-1
-        #     sections = sections[num:]
-        #     start = True
-        #     total = total - num
-        # if start2 == False and url_idx == 2:
-        #     num = 1129-1+28-1+143-1+196-1+780-1+2461-1
-        #     sections = sections[num:]
-        #     start2 = True
-        #     total = total - num
+
+        
         for section in sections:
                 
             print(f"Url {url_idx}/{url_len} | Bill number {idx}/{total}")
@@ -57,9 +49,7 @@ def main():
             else: 
                 print(f"fails {links[0]['href']}")
                 failed_links.append(links[0]['href'])
-            # if idx % 15 == 0:
-                # print("sleep time")
-                # time.sleep(5)
+
             print("----------------------------------------------------------------------")
             idx+=1
         url_idx+=1
@@ -106,10 +96,7 @@ def insert_bill(bill):
             cursor_used = cursor.execute(sqlite_insert_query, bill)
             sqliteConnection.commit()
             _id = cursor_used.lastrowid
-            
-            # bill["name"] = bill_name
-            # bill["date"] = bill_date
-            # bill["voting_data"]  =voting_data
+
         else: 
             # If bill exists set its id.
             print("already exists")
@@ -128,9 +115,9 @@ def member_to_db(member):
     try: 
         sqliteConnection = sqlite3.connect('db/db.db')
         cursor = sqliteConnection.cursor()
-        sqlite_get_query = """SELECT * FROM members WHERE name = ? AND party = ?"""
+        sqlite_get_query = """SELECT * FROM members WHERE name = ? AND party = ? AND placement = ?"""
         
-        cursor.execute(sqlite_get_query, (member["name"], member["party"]))
+        cursor.execute(sqlite_get_query, (member["name"], member["party"], member["place"]))
         record = cursor.fetchone()
         # print(record)
         if record == None:
@@ -158,19 +145,6 @@ def get_bill_data(url):
     soup = BeautifulSoup(response.text, 'html.parser')
     try:
         text = soup.find_all("span", attrs={'class': "fBeuvH"})[0]
-    # except:
-        # Comment out and move the except down, return ("", "") if it fails
-        # print("trying exception")
-        # print("but sleep first ")
-        # time.sleep(5)
-        # print("zzzZZZzzzZZZ")
-        # split_url = url.split("bet%3D")
-        # new_url = f"{split_url[0]}{split_url[1]}"
-        # response = requests.get(new_url)
-        # soup = BeautifulSoup(response.text, 'html.parser')
-        # text = soup.find_all("span", attrs={'class': "fBeuvH"})[0]
-        
-    # sections = soup.find_all("span", attrs={'class': "fBeuvH"})
         sections = soup.find_all("a", attrs={'class': "dbpaZU"})
         # date = "2024-01-02"
         # print(sections)
@@ -217,5 +191,31 @@ def get_voting_data(url):
     # print(voting_data)
     return voting_data
 
+def fix_dates():
+    try: 
+        sqliteConnection = sqlite3.connect('db/db.db')
+        cursor = sqliteConnection.cursor()
+        sqlite_get_query = """SELECT date, id FROM bills"""
+        cursor.execute(sqlite_get_query)
+        
+        records = cursor.fetchall()
+        # print(len(records))
+        for record in records:
+            # print(record)
+            try:
+                parsed = dateparser.parse(record[0])
+                # insert into sql
+                # print(parsed)
+                update_query = """UPDATE bills SET date = ? WHERE id = ?"""
+                cursor.execute(update_query, (parsed, record[1]))
+                sqliteConnection.commit()
+
+            except sqlite3.Error as error:
+                print(f"could not parse on id: {record[1]}")
+                print(f"{error}")
+    except sqlite3.Error as error:
+        print(error)
+    
 if __name__ == "__main__":
     main()
+    fix_dates()
